@@ -3,7 +3,14 @@ import { GoogleGenAI, Type } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export interface ScalingAnalysis {
-  businessModel: string;
+  businessModel: {
+    valueProposition: string;
+    targetSegments: string;
+    revenueStreams: string;
+    costStructure: string;
+    distributionChannels: string;
+    competitiveMoat: string;
+  };
   example: string;
   scalingBlockers: {
     title: string;
@@ -27,23 +34,24 @@ export async function analyzeBusiness(
     {
       text: `Analyze the following business information (from a website URL or a PDF document).
       
-      1. Deconstruct the business model: How does this company earn money? What are the primary revenue streams?
-         - MANDATORY: Each revenue stream MUST be a separate bullet point on its own line (starting with "- ").
-         - NEVER use inline separators like "*" or "•" to separate points.
-         - Use bold headers for each section.
-         - Ensure there is a blank line between the header and the list.
-         - Avoid long paragraphs. Use short, punchy sentences.
+      1. Deep Business Model Deconstruction:
+         - Value Proposition: What is the core problem being solved and the unique value delivered?
+         - Target Customer Segments: Who is the Ideal Customer Profile (ICP)?
+         - Revenue Streams: Exactly how does the business make money? (Pricing models, recurring vs one-off).
+         - Cost Structure: What are the primary drivers of fixed and variable costs? Will costs scale linearly or exponentially?
+         - Distribution Channels: How does the business acquire customers? (GTM motion, sales, marketing channels).
+         - Competitive Moat: What makes this business defensible? (Network effects, IP, high switching costs).
+         
+         MANDATORY: For each dimension, use short, punchy sentences and proper Markdown bullet points where appropriate.
       
       2. Explain with a concrete example: Provide a scenario of a single transaction or customer journey.
          - MANDATORY: Break the journey into clear, bulleted steps or stages (e.g., Discovery, Engagement, Value Delivery, Expansion).
          - Each stage MUST be its own bullet point on its own line (starting with "- ").
-         - Ensure there is a blank line between the header and the list.
-         - Make it highly readable and structured.
       
       3. Identify Scaling Blockers: What is preventing this business from scaling from 1 to 100?
          - For each blocker, assign a priority (High, Medium, Low).
       
-      4. Suggest 5+ Actionable Ideas: Provide specific, high-impact strategies.
+      4. Suggest 5 Top Actionable Ideas: Provide specific, high-impact strategies to achieve 1-100 scaling.
          - For each idea, provide:
            - Probability of success (e.g., "80%")
            - Why it might fail (potential risks or dependencies)
@@ -74,7 +82,18 @@ export async function analyzeBusiness(
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          businessModel: { type: Type.STRING },
+          businessModel: {
+            type: Type.OBJECT,
+            properties: {
+              valueProposition: { type: Type.STRING },
+              targetSegments: { type: Type.STRING },
+              revenueStreams: { type: Type.STRING },
+              costStructure: { type: Type.STRING },
+              distributionChannels: { type: Type.STRING },
+              competitiveMoat: { type: Type.STRING },
+            },
+            required: ["valueProposition", "targetSegments", "revenueStreams", "costStructure", "distributionChannels", "competitiveMoat"],
+          },
           example: { type: Type.STRING },
           scalingBlockers: {
             type: Type.ARRAY,

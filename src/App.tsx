@@ -9,13 +9,16 @@ import {
   FileText,
   Loader2,
   ChevronRight,
-  Zap
+  Zap,
+  Download
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import ReactMarkdown from "react-markdown";
 import { analyzeBusiness, ScalingAnalysis } from "./services/gemini";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -27,7 +30,9 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScalingAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -73,6 +78,35 @@ export default function App() {
       setError(err.message || "An error occurred during analysis.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!resultsRef.current) return;
+    setDownloading(true);
+    try {
+      const element = resultsRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#F8F9FA"
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width / 2, canvas.height / 2]
+      });
+      
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.save(`ScaleUp-Analysis-${new Date().getTime()}.pdf`);
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      setError("Failed to generate PDF. Please try again.");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -193,10 +227,30 @@ export default function App() {
         <AnimatePresence>
           {result && (
             <motion.div
+              ref={resultsRef}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-12"
+              className="space-y-12 pb-20"
             >
+              <div className="flex items-center justify-between border-b border-zinc-200 pb-6">
+                <div>
+                  <h2 className="text-3xl font-black tracking-tight text-zinc-900">Analysis Results</h2>
+                  <p className="text-zinc-500 text-sm mt-1">Generated on {new Date().toLocaleDateString()}</p>
+                </div>
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={downloading}
+                  className="flex items-center gap-2 px-6 py-3 bg-white border border-zinc-200 rounded-xl font-bold text-sm hover:bg-zinc-50 transition-all shadow-sm disabled:opacity-50"
+                >
+                  {downloading ? (
+                    <Loader2 className="animate-spin" size={16} />
+                  ) : (
+                    <Download size={16} />
+                  )}
+                  <span>{downloading ? "Generating..." : "Download PDF"}</span>
+                </button>
+              </div>
+
               {/* Business Model & Example */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <section className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
@@ -205,15 +259,35 @@ export default function App() {
                       <Zap size={20} />
                     </div>
                     <h3 className="text-xl font-black uppercase tracking-tight text-zinc-900">
-                      Business Model Deconstruction
+                      Deep Business Model Deconstruction
                     </h3>
                   </div>
-                  <div className="prose prose-zinc max-w-none prose-lg">
-                    <ReactMarkdown>{result.businessModel}</ReactMarkdown>
+                  
+                  <div className="space-y-8">
+                    {[
+                      { label: "Value Proposition", value: result.businessModel.valueProposition, icon: "💎" },
+                      { label: "Target Customer Segments (ICP)", value: result.businessModel.targetSegments, icon: "🎯" },
+                      { label: "Revenue Streams", value: result.businessModel.revenueStreams, icon: "💰" },
+                      { label: "Cost Structure", value: result.businessModel.costStructure, icon: "🏗️" },
+                      { label: "Distribution Channels", value: result.businessModel.distributionChannels, icon: "🚀" },
+                      { label: "Competitive Moat", value: result.businessModel.competitiveMoat, icon: "🏰" },
+                    ].map((dimension, i) => (
+                      <div key={i} className="group">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{dimension.icon}</span>
+                          <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 group-hover:text-emerald-600 transition-colors">
+                            {dimension.label}
+                          </h4>
+                        </div>
+                        <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed">
+                          <ReactMarkdown>{dimension.value}</ReactMarkdown>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </section>
 
-                <section className="bg-zinc-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border border-white/5">
+                <section className="bg-zinc-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border border-white/5 h-fit lg:sticky lg:top-24">
                   <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
                     <TrendingUp size={200} />
                   </div>
