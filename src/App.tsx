@@ -199,25 +199,33 @@ export default function App() {
             >
               {/* Business Model & Example */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <section className="bg-white p-10 rounded-[2rem] border border-zinc-200 shadow-sm">
-                  <div className="flex items-center gap-2 mb-8 text-emerald-600 uppercase tracking-widest text-xs font-bold">
-                    <Zap size={14} />
-                    <span>Business Model Deconstruction</span>
+                <section className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
+                  <div className="flex items-center gap-3 mb-10">
+                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                      <Zap size={20} />
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tight text-zinc-900">
+                      Business Model Deconstruction
+                    </h3>
                   </div>
-                  <div className="prose prose-zinc max-w-none">
+                  <div className="prose prose-zinc max-w-none prose-lg">
                     <ReactMarkdown>{result.businessModel}</ReactMarkdown>
                   </div>
                 </section>
 
-                <section className="bg-zinc-900 p-10 rounded-[2rem] text-white shadow-xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-10">
-                    <TrendingUp size={120} />
+                <section className="bg-zinc-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border border-white/5">
+                  <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
+                    <TrendingUp size={200} />
                   </div>
-                  <div className="flex items-center gap-2 mb-8 text-emerald-400 uppercase tracking-widest text-xs font-bold relative z-10">
-                    <ChevronRight size={14} />
-                    <span>The Customer Journey (Example)</span>
+                  <div className="flex items-center gap-3 mb-10 relative z-10">
+                    <div className="w-10 h-10 bg-white/10 text-emerald-400 rounded-xl flex items-center justify-center">
+                      <ChevronRight size={20} />
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tight text-white">
+                      The Customer Journey
+                    </h3>
                   </div>
-                  <div className="prose prose-invert max-w-none relative z-10 font-serif text-xl leading-relaxed opacity-90">
+                  <div className="prose prose-invert max-w-none relative z-10 prose-lg text-zinc-100 leading-relaxed">
                     <ReactMarkdown>{result.example}</ReactMarkdown>
                   </div>
                 </section>
