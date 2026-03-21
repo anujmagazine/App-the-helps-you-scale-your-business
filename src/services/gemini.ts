@@ -5,11 +5,16 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export interface ScalingAnalysis {
   businessModel: string;
   example: string;
-  scalingBlockers: string[];
+  scalingBlockers: {
+    title: string;
+    priority: "High" | "Medium" | "Low";
+  }[];
   actionableIdeas: {
     title: string;
     description: string;
     impact: "High" | "Medium" | "Low";
+    probabilityOfSuccess: string;
+    whyItMightFail: string;
   }[];
 }
 
@@ -36,8 +41,12 @@ export async function analyzeBusiness(
          - Make it highly readable and structured.
       
       3. Identify Scaling Blockers: What is preventing this business from scaling from 1 to 100?
+         - For each blocker, assign a priority (High, Medium, Low).
       
       4. Suggest 5+ Actionable Ideas: Provide specific, high-impact strategies.
+         - For each idea, provide:
+           - Probability of success (e.g., "80%")
+           - Why it might fail (potential risks or dependencies)
       
       Return the response in JSON format.`,
     },
@@ -69,7 +78,14 @@ export async function analyzeBusiness(
           example: { type: Type.STRING },
           scalingBlockers: {
             type: Type.ARRAY,
-            items: { type: Type.STRING },
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                priority: { type: Type.STRING, enum: ["High", "Medium", "Low"] },
+              },
+              required: ["title", "priority"],
+            },
           },
           actionableIdeas: {
             type: Type.ARRAY,
@@ -79,8 +95,10 @@ export async function analyzeBusiness(
                 title: { type: Type.STRING },
                 description: { type: Type.STRING },
                 impact: { type: Type.STRING, enum: ["High", "Medium", "Low"] },
+                probabilityOfSuccess: { type: Type.STRING },
+                whyItMightFail: { type: Type.STRING },
               },
-              required: ["title", "description", "impact"],
+              required: ["title", "description", "impact", "probabilityOfSuccess", "whyItMightFail"],
             },
           },
         },

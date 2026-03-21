@@ -244,12 +244,22 @@ export default function App() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="p-5 bg-white border border-zinc-200 rounded-2xl flex gap-4 items-start"
+                      className="p-5 bg-white border border-zinc-200 rounded-2xl flex flex-col gap-3"
                     >
-                      <div className="w-6 h-6 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 mt-1">
-                        <span className="text-xs font-bold">{idx + 1}</span>
+                      <div className="flex items-center justify-between">
+                        <div className="w-6 h-6 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0 text-xs font-bold">
+                          {idx + 1}
+                        </div>
+                        <div className={cn(
+                          "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                          blocker.priority === "High" ? "bg-red-100 text-red-700" :
+                          blocker.priority === "Medium" ? "bg-amber-100 text-amber-700" :
+                          "bg-blue-100 text-blue-700"
+                        )}>
+                          {blocker.priority} Priority
+                        </div>
                       </div>
-                      <p className="text-zinc-700 font-medium leading-snug">{blocker}</p>
+                      <p className="text-zinc-700 font-medium leading-snug">{blocker.title}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -266,30 +276,51 @@ export default function App() {
                     Actionable Strategies
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {result.actionableIdeas.map((idea, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + idx * 0.1 }}
-                      className="group bg-white border border-zinc-200 p-6 rounded-3xl hover:border-emerald-200 hover:bg-emerald-50/30 transition-all flex flex-col sm:flex-row gap-6 items-start sm:items-center"
+                      className="group bg-white border border-zinc-200 p-8 rounded-[2rem] hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-500/5 transition-all"
                     >
-                      <div className="sm:w-1/4">
-                        <div className={cn(
-                          "inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-2",
-                          idea.impact === "High" ? "bg-red-100 text-red-700" :
-                          idea.impact === "Medium" ? "bg-blue-100 text-blue-700" :
-                          "bg-zinc-100 text-zinc-700"
-                        )}>
-                          {idea.impact} Impact
+                      <div className="flex flex-col lg:flex-row gap-8">
+                        <div className="lg:w-1/3 space-y-4">
+                          <div className="flex items-center gap-2">
+                            <div className={cn(
+                              "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                              idea.impact === "High" ? "bg-red-100 text-red-700" :
+                              idea.impact === "Medium" ? "bg-blue-100 text-blue-700" :
+                              "bg-zinc-100 text-zinc-700"
+                            )}>
+                              {idea.impact} Impact
+                            </div>
+                            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                              <CheckCircle2 size={10} />
+                              {idea.probabilityOfSuccess} Success
+                            </div>
+                          </div>
+                          <h4 className="font-black text-2xl text-zinc-900 group-hover:text-emerald-700 transition-colors leading-tight">
+                            {idea.title}
+                          </h4>
                         </div>
-                        <h4 className="font-bold text-lg text-zinc-900 group-hover:text-emerald-700 transition-colors">
-                          {idea.title}
-                        </h4>
-                      </div>
-                      <div className="sm:w-3/4 text-zinc-600 leading-relaxed">
-                        {idea.description}
+                        
+                        <div className="lg:w-2/3 space-y-6">
+                          <div className="text-zinc-600 text-lg leading-relaxed">
+                            {idea.description}
+                          </div>
+                          
+                          <div className="p-5 bg-zinc-50 rounded-2xl border border-zinc-100">
+                            <div className="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-widest text-zinc-400">
+                              <AlertTriangle size={14} className="text-amber-500" />
+                              Risk Assessment: Why it might fail
+                            </div>
+                            <p className="text-zinc-500 text-sm leading-relaxed italic">
+                              {idea.whyItMightFail}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
