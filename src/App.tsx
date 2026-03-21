@@ -199,8 +199,8 @@ export default function App() {
             >
               {/* Business Model & Example */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <section className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
-                  <div className="flex items-center gap-2 mb-6 text-emerald-600 uppercase tracking-widest text-xs font-bold">
+                <section className="bg-white p-10 rounded-[2rem] border border-zinc-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-8 text-emerald-600 uppercase tracking-widest text-xs font-bold">
                     <Zap size={14} />
                     <span>Business Model Deconstruction</span>
                   </div>
@@ -209,12 +209,15 @@ export default function App() {
                   </div>
                 </section>
 
-                <section className="bg-zinc-900 p-8 rounded-3xl text-white shadow-xl">
-                  <div className="flex items-center gap-2 mb-6 text-emerald-400 uppercase tracking-widest text-xs font-bold">
+                <section className="bg-zinc-900 p-10 rounded-[2rem] text-white shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-10">
+                    <TrendingUp size={120} />
+                  </div>
+                  <div className="flex items-center gap-2 mb-8 text-emerald-400 uppercase tracking-widest text-xs font-bold relative z-10">
                     <ChevronRight size={14} />
                     <span>The Customer Journey (Example)</span>
                   </div>
-                  <div className="prose prose-invert max-w-none opacity-90 italic font-serif text-lg leading-relaxed">
+                  <div className="prose prose-invert max-w-none relative z-10 font-serif text-xl leading-relaxed opacity-90">
                     <ReactMarkdown>{result.example}</ReactMarkdown>
                   </div>
                 </section>

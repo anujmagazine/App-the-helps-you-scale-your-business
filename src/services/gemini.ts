@@ -23,9 +23,15 @@ export async function analyzeBusiness(
       text: `Analyze the following business information (from a website URL or a PDF document).
       
       1. Deconstruct the business model: How does this company earn money? What are the primary revenue streams?
+         - Use structured Markdown: Use bold headers, bullet points for revenue streams, and clear spacing.
+         - Avoid dense paragraphs. Break information into logical chunks.
+      
       2. Explain with a concrete example: Provide a scenario of a single transaction or customer journey.
-      3. Identify Scaling Blockers: What is preventing this business from scaling from 1 to 100? (e.g., operational bottlenecks, market saturation, technical debt, etc.)
-      4. Suggest 5+ Actionable Ideas: Provide specific, high-impact strategies to overcome these blockers and achieve massive scale.
+         - Use a narrative style but keep it concise.
+      
+      3. Identify Scaling Blockers: What is preventing this business from scaling from 1 to 100?
+      
+      4. Suggest 5+ Actionable Ideas: Provide specific, high-impact strategies.
       
       Return the response in JSON format.`,
     },

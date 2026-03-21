@@ -9,15 +9,18 @@
 
 @layer base {
   .prose h1, .prose h2, .prose h3 {
-    @apply font-bold tracking-tight text-zinc-900 mt-6 mb-4;
+    @apply font-bold tracking-tight text-zinc-900 mt-8 mb-4;
   }
   .prose p {
-    @apply mb-4 leading-relaxed;
+    @apply mb-5 leading-relaxed text-zinc-700;
   }
   .prose ul {
-    @apply list-disc pl-5 mb-4 space-y-2;
+    @apply list-disc pl-6 mb-6 space-y-3;
+  }
+  .prose li {
+    @apply leading-relaxed text-zinc-700;
   }
   .prose strong {
-    @apply font-semibold text-zinc-900;
+    @apply font-bold text-zinc-900;
   }
 }
