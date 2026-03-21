@@ -23,12 +23,16 @@ export async function analyzeBusiness(
       text: `Analyze the following business information (from a website URL or a PDF document).
       
       1. Deconstruct the business model: How does this company earn money? What are the primary revenue streams?
-         - MANDATORY: Use a clear, bulleted list for revenue streams.
+         - MANDATORY: Each revenue stream MUST be a separate bullet point on its own line (starting with "- ").
+         - NEVER use inline separators like "*" or "•" to separate points.
          - Use bold headers for each section.
+         - Ensure there is a blank line between the header and the list.
          - Avoid long paragraphs. Use short, punchy sentences.
       
       2. Explain with a concrete example: Provide a scenario of a single transaction or customer journey.
          - MANDATORY: Break the journey into clear, bulleted steps or stages (e.g., Discovery, Engagement, Value Delivery, Expansion).
+         - Each stage MUST be its own bullet point on its own line (starting with "- ").
+         - Ensure there is a blank line between the header and the list.
          - Make it highly readable and structured.
       
       3. Identify Scaling Blockers: What is preventing this business from scaling from 1 to 100?
@@ -56,6 +60,7 @@ export async function analyzeBusiness(
     model: "gemini-3.1-pro-preview",
     contents: [{ role: "user", parts }],
     config: {
+      systemInstruction: "You are a business scaling expert. Always format lists using proper Markdown bullet points (starting with '- ' on a new line). Never use inline separators like '*' or '•' for lists. Always use double newlines between headers and lists for maximum readability.",
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
