@@ -259,15 +259,35 @@ export default function App() {
                       <Zap size={20} />
                     </div>
                     <h3 className="text-xl font-black uppercase tracking-tight text-zinc-900">
-                      Business Model Deconstruction
+                      Deep Business Model Deconstruction
                     </h3>
                   </div>
-                  <div className="prose prose-zinc max-w-none prose-lg">
-                    <ReactMarkdown>{result.businessModel}</ReactMarkdown>
+                  
+                  <div className="space-y-8">
+                    {[
+                      { label: "Value Proposition", value: result.businessModel.valueProposition, icon: "💎" },
+                      { label: "Target Customer Segments (ICP)", value: result.businessModel.targetSegments, icon: "🎯" },
+                      { label: "Revenue Streams", value: result.businessModel.revenueStreams, icon: "💰" },
+                      { label: "Cost Structure", value: result.businessModel.costStructure, icon: "🏗️" },
+                      { label: "Distribution Channels", value: result.businessModel.distributionChannels, icon: "🚀" },
+                      { label: "Competitive Moat", value: result.businessModel.competitiveMoat, icon: "🏰" },
+                    ].map((dimension, i) => (
+                      <div key={i} className="group">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{dimension.icon}</span>
+                          <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 group-hover:text-emerald-600 transition-colors">
+                            {dimension.label}
+                          </h4>
+                        </div>
+                        <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed">
+                          <ReactMarkdown>{dimension.value}</ReactMarkdown>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </section>
 
-                <section className="bg-zinc-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border border-white/5">
+                <section className="bg-zinc-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border border-white/5 h-fit lg:sticky lg:top-24">
                   <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
                     <TrendingUp size={200} />
                   </div>

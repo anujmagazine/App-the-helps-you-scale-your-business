@@ -41,6 +41,8 @@ export async function analyzeBusiness(
          - Make it highly readable and structured.
       
       3. Identify Scaling Blockers: What is preventing this business from scaling from 1 to 100?
+         - Provide AT LEAST 5 distinct blockers.
+         - Order them from highest priority (High) to lowest priority (Low).
          - For each blocker, assign a priority (High, Medium, Low).
       
       4. Suggest 5+ Actionable Ideas: Provide specific, high-impact strategies.
