@@ -294,39 +294,53 @@ function Results() {
           </div>
         )}
 
-        {/* Business Model & Example */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-                <Zap size={20} />
-              </div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-zinc-900">
-                Business Model Deconstruction
-              </h3>
+        {/* Business Model */}
+        <section className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+              <Zap size={20} />
             </div>
-            <div className="prose prose-zinc max-w-none prose-lg">
-              <ReactMarkdown>{result.businessModel}</ReactMarkdown>
-            </div>
-          </section>
+            <h3 className="text-xl font-black uppercase tracking-tight text-zinc-900">
+              Business Model Deconstruction
+            </h3>
+          </div>
+          <div className="prose prose-zinc max-w-none prose-lg">
+            <ReactMarkdown>{result.businessModel}</ReactMarkdown>
+          </div>
+        </section>
 
-          <section className="bg-zinc-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border border-white/5">
-            <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
-              <TrendingUp size={200} />
+        {/* Customer Journeys */}
+        <section>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-zinc-900 text-emerald-400 rounded-xl flex items-center justify-center">
+              <ChevronRight size={20} />
             </div>
-            <div className="flex items-center gap-3 mb-10 relative z-10">
-              <div className="w-10 h-10 bg-white/10 text-emerald-400 rounded-xl flex items-center justify-center">
-                <ChevronRight size={20} />
-              </div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">
-                The Customer Journey
-              </h3>
-            </div>
-            <div className="prose prose-invert max-w-none relative z-10 prose-lg text-zinc-100 leading-relaxed">
-              <ReactMarkdown>{result.example}</ReactMarkdown>
-            </div>
-          </section>
-        </div>
+            <h3 className="text-2xl font-bold text-zinc-900">
+              Prominent Customer Journeys
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {result.customerJourneys.map((journey, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + idx * 0.1 }}
+                className="bg-zinc-900 p-8 rounded-[2rem] text-white shadow-xl relative overflow-hidden border border-white/5 flex flex-col"
+              >
+                <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
+                  <TrendingUp size={120} />
+                </div>
+                <h4 className="text-lg font-black uppercase tracking-tight text-emerald-400 mb-6 relative z-10">
+                  {journey.title}
+                </h4>
+                <div className="prose prose-invert max-w-none relative z-10 prose-sm text-zinc-100 leading-relaxed flex-grow">
+                  <ReactMarkdown>{journey.content}</ReactMarkdown>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
 
         {/* Scaling Blockers */}
         <section>

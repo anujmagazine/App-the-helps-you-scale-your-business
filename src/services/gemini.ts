@@ -4,7 +4,10 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export interface ScalingAnalysis {
   businessModel: string;
-  example: string;
+  customerJourneys: {
+    title: string;
+    content: string;
+  }[];
   scalingBlockers: {
     title: string;
     priority: "High" | "Medium" | "Low";
@@ -34,8 +37,9 @@ export async function analyzeBusiness(
          - Ensure there is a blank line between the header and the list.
          - Avoid long paragraphs. Use short, punchy sentences.
       
-      2. Explain with a concrete example: Provide a scenario of a single transaction or customer journey.
-         - MANDATORY: Break the journey into clear, bulleted steps or stages (e.g., Discovery, Engagement, Value Delivery, Expansion).
+      2. Explain with 3 prominent Customer Journeys: Provide scenarios for different types of customers or use cases.
+         - For each journey, provide a descriptive title (e.g., "The Enterprise Buyer", "The Self-Serve User").
+         - Break each journey into clear, bulleted steps or stages (e.g., Discovery, Engagement, Value Delivery, Expansion).
          - Each stage MUST be its own bullet point on its own line (starting with "- ").
          - Ensure there is a blank line between the header and the list.
          - Make it highly readable and structured.
@@ -77,7 +81,17 @@ export async function analyzeBusiness(
         type: Type.OBJECT,
         properties: {
           businessModel: { type: Type.STRING },
-          example: { type: Type.STRING },
+          customerJourneys: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                content: { type: Type.STRING },
+              },
+              required: ["title", "content"],
+            },
+          },
           scalingBlockers: {
             type: Type.ARRAY,
             items: {
@@ -104,7 +118,7 @@ export async function analyzeBusiness(
             },
           },
         },
-        required: ["businessModel", "example", "scalingBlockers", "actionableIdeas"],
+        required: ["businessModel", "customerJourneys", "scalingBlockers", "actionableIdeas"],
       },
       tools: url ? [{ urlContext: {} }] : undefined,
     },
