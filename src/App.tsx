@@ -224,27 +224,85 @@ function Results() {
   const handleDownloadPDF = async () => {
     if (!resultsRef.current) return;
     setDownloading(true);
+    setError(null);
     try {
       const element = resultsRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#F8F9FA"
-      });
       
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [canvas.width / 2, canvas.height / 2]
-      });
+      console.log("Starting PDF generation...");
       
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
-      pdf.save(`ScaleUp-Analysis-${new Date().getTime()}.pdf`);
-    } catch (err) {
+      // Use html2canvas to capture the element
+      let canvas;
+      try {
+        canvas = await html2canvas(element, {
+          scale: 1,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#F8F9FA",
+          scrollY: -window.scrollY,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight,
+          onclone: (clonedDoc) => {
+            // Hide elements that shouldn't be in the PDF
+            const buttons = clonedDoc.querySelectorAll('button');
+            buttons.forEach(btn => (btn.style.display = 'none'));
+            
+            const links = clonedDoc.querySelectorAll('a');
+            links.forEach(link => (link.style.display = 'none'));
+
+            // Remove transforms that might interfere with capture
+            const allElements = clonedDoc.querySelectorAll('*');
+            allElements.forEach(el => {
+              if (el instanceof HTMLElement) {
+                el.style.transform = 'none';
+                el.style.transition = 'none';
+                el.style.animation = 'none';
+              }
+            });
+          }
+        });
+      } catch (canvasError: any) {
+        throw new Error(`Canvas capture failed: ${canvasError.message || "Unknown canvas error"}`);
+      }
+      
+      if (!canvas) throw new Error("Canvas generation failed");
+
+      // Convert canvas to image
+      const imgData = canvas.toDataURL("image/jpeg", 0.9);
+      
+      // Initialize jsPDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      // Calculate dimensions
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add pages
+      try {
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+          heightLeft -= pdfHeight;
+        }
+        
+        // Sanitize filename
+        const safeCompanyName = (result.companyName || 'analysis').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+        pdf.save(`scaling-strategy-${safeCompanyName}.pdf`);
+      } catch (pdfError: any) {
+        throw new Error(`PDF assembly failed: ${pdfError.message || "Unknown PDF error"}`);
+      }
+      
+    } catch (err: any) {
       console.error("PDF Generation Error:", err);
-      setError("Failed to generate PDF. Please try again.");
+      setError(`Error: ${err.message || "Failed to generate PDF"}. Please try again.`);
     } finally {
       setDownloading(false);
     }
@@ -263,41 +321,41 @@ function Results() {
       </div>
 
       <motion.div
-        ref={resultsRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-12 pb-20"
       >
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-200 pb-6 gap-4">
-          <div>
-            <h2 className="text-3xl font-black tracking-tight text-zinc-900">
-              Business model deconstruction and Scaling strategies for <span className="text-emerald-600">{result.companyName}</span>
-            </h2>
-            <p className="text-zinc-500 text-sm mt-1">Generated on {new Date().toLocaleDateString()}</p>
+        <div ref={resultsRef} className="space-y-12">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-200 pb-6 gap-4">
+            <div>
+              <h2 className="text-3xl font-black tracking-tight text-zinc-900">
+                Business model deconstruction and Scaling strategies for <span className="text-emerald-600">{result.companyName}</span>
+              </h2>
+              <p className="text-zinc-500 text-sm mt-1">Generated on {new Date().toLocaleDateString()}</p>
+            </div>
+            <button
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+              className="flex items-center gap-2 px-6 py-3 bg-white border border-zinc-200 rounded-xl font-bold text-sm hover:bg-zinc-50 transition-all shadow-sm disabled:opacity-50"
+            >
+              {downloading ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : (
+                <Download size={16} />
+              )}
+              <span>{downloading ? "Generating..." : "Download PDF"}</span>
+            </button>
           </div>
-          <button
-            onClick={handleDownloadPDF}
-            disabled={downloading}
-            className="flex items-center gap-2 px-6 py-3 bg-white border border-zinc-200 rounded-xl font-bold text-sm hover:bg-zinc-50 transition-all shadow-sm disabled:opacity-50"
-          >
-            {downloading ? (
-              <Loader2 className="animate-spin" size={16} />
-            ) : (
-              <Download size={16} />
-            )}
-            <span>{downloading ? "Generating..." : "Download PDF"}</span>
-          </button>
-        </div>
 
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl flex items-center gap-3">
-            <AlertTriangle size={20} />
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl flex items-center gap-3">
+              <AlertTriangle size={20} />
+              <p className="text-sm font-medium">{error}</p>
+            </div>
+          )}
 
-        {/* Business Model */}
-        <section className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
+          {/* Business Model */}
+          <section className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
           <div className="flex items-center gap-3 mb-10">
             <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
               <Zap size={20} />
@@ -446,6 +504,7 @@ function Results() {
             ScaleUp AI • Powered by Gemini 3.1 Pro
           </p>
         </footer>
+        </div>
       </motion.div>
     </main>
   );
