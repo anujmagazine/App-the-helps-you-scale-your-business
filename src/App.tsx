@@ -19,7 +19,7 @@ import { analyzeBusiness, ScalingAnalysis } from "./services/gemini";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { domToCanvas } from "modern-screenshot";
 import { 
   BrowserRouter, 
   Routes, 
@@ -228,40 +228,38 @@ function Results() {
     try {
       const element = resultsRef.current;
       
-      console.log("Starting PDF generation...");
+      console.log("Starting PDF generation with modern-screenshot...");
       
-      // Use html2canvas to capture the element
+      // Use modern-screenshot to capture the element
+      // It handles modern CSS like oklch much better than html2canvas
       let canvas;
       try {
-        canvas = await html2canvas(element, {
+        canvas = await domToCanvas(element, {
           scale: 1,
-          useCORS: true,
-          logging: false,
           backgroundColor: "#F8F9FA",
-          scrollY: -window.scrollY,
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight,
-          onclone: (clonedDoc) => {
-            // Hide elements that shouldn't be in the PDF
-            const buttons = clonedDoc.querySelectorAll('button');
-            buttons.forEach(btn => (btn.style.display = 'none'));
-            
-            const links = clonedDoc.querySelectorAll('a');
-            links.forEach(link => (link.style.display = 'none'));
-
-            // Remove transforms that might interfere with capture
-            const allElements = clonedDoc.querySelectorAll('*');
-            allElements.forEach(el => {
-              if (el instanceof HTMLElement) {
-                el.style.transform = 'none';
-                el.style.transition = 'none';
-                el.style.animation = 'none';
-              }
-            });
+          filter: (node) => {
+            if (node instanceof HTMLElement) {
+              // Exclude buttons and links from the PDF
+              if (node.tagName === 'BUTTON' || node.tagName === 'A') return false;
+            }
+            return true;
+          },
+          onCloneNode: (cloned) => {
+            if (cloned instanceof HTMLElement) {
+              // Remove transforms that might interfere with capture
+              const allElements = cloned.querySelectorAll('*');
+              allElements.forEach(el => {
+                if (el instanceof HTMLElement) {
+                  el.style.transform = 'none';
+                  el.style.transition = 'none';
+                  el.style.animation = 'none';
+                }
+              });
+            }
           }
         });
-      } catch (canvasError: any) {
-        throw new Error(`Canvas capture failed: ${canvasError.message || "Unknown canvas error"}`);
+      } catch (captureError: any) {
+        throw new Error(`DOM capture failed: ${captureError.message || "Unknown capture error"}`);
       }
       
       if (!canvas) throw new Error("Canvas generation failed");
