@@ -3,6 +3,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export interface ScalingAnalysis {
+  companyName: string;
   businessModel: string;
   customerJourneys: {
     title: string;
@@ -30,7 +31,9 @@ export async function analyzeBusiness(
     {
       text: `Analyze the following business information (from a website URL or a PDF document).
       
-      1. Deconstruct the business model: How does this company earn money? What are the primary revenue streams?
+      1. Identify the company name: What is the name of the company being analyzed?
+      
+      2. Deconstruct the business model: How does this company earn money? What are the primary revenue streams?
          - MANDATORY: Each revenue stream MUST be a separate bullet point on its own line (starting with "- ").
          - NEVER use inline separators like "*" or "•" to separate points.
          - Use bold headers for each section.
@@ -80,6 +83,7 @@ export async function analyzeBusiness(
       responseSchema: {
         type: Type.OBJECT,
         properties: {
+          companyName: { type: Type.STRING },
           businessModel: { type: Type.STRING },
           customerJourneys: {
             type: Type.ARRAY,
@@ -118,7 +122,7 @@ export async function analyzeBusiness(
             },
           },
         },
-        required: ["businessModel", "customerJourneys", "scalingBlockers", "actionableIdeas"],
+        required: ["companyName", "businessModel", "customerJourneys", "scalingBlockers", "actionableIdeas"],
       },
       tools: url ? [{ urlContext: {} }] : undefined,
     },
