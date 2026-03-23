@@ -271,7 +271,7 @@ function Results() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-200 pb-6 gap-4">
           <div>
             <h2 className="text-3xl font-black tracking-tight text-zinc-900">
-              Analysis Results: <span className="text-emerald-600">{result.companyName}</span>
+              Business model deconstruction and Scaling strategies for <span className="text-emerald-600">{result.companyName}</span>
             </h2>
             <p className="text-zinc-500 text-sm mt-1">Generated on {new Date().toLocaleDateString()}</p>
           </div>
