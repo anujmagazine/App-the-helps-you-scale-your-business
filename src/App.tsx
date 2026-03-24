@@ -239,8 +239,8 @@ function Results() {
           backgroundColor: "#F8F9FA",
           filter: (node) => {
             if (node instanceof HTMLElement) {
-              // Exclude buttons and links from the PDF
-              if (node.tagName === 'BUTTON' || node.tagName === 'A') return false;
+              // Exclude buttons, links, and elements with 'no-print' class from the PDF
+              if (node.tagName === 'BUTTON' || node.tagName === 'A' || node.classList.contains('no-print')) return false;
             }
             return true;
           },
@@ -324,24 +324,39 @@ function Results() {
         className="space-y-12 pb-20"
       >
         <div ref={resultsRef} className="space-y-12">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-200 pb-6 gap-4">
-            <div>
-              <h2 className="text-3xl font-black tracking-tight text-zinc-900">
-                Business model deconstruction and Scaling strategies for <span className="text-emerald-600">{result.companyName}</span>
+          <div className="border-b-4 border-zinc-900 pb-10 mb-10">
+            <div className="max-w-4xl">
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-zinc-900 leading-[0.95] mb-6">
+                Scaling Strategy Report: <span className="text-emerald-600">{result.companyName}</span>
               </h2>
-              <p className="text-zinc-500 text-sm mt-1">Generated on {new Date().toLocaleDateString()}</p>
+              <div className="flex flex-wrap items-center gap-6 text-zinc-500">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-sm font-bold uppercase tracking-widest">Business Deconstruction</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-blue-500" />
+                  <span className="text-sm font-bold uppercase tracking-widest">Growth Roadmap</span>
+                </div>
+                <div className="text-sm font-mono ml-auto">
+                  {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div className="flex justify-end mb-8 no-print">
             <button
               onClick={handleDownloadPDF}
               disabled={downloading}
-              className="flex items-center gap-2 px-6 py-3 bg-white border border-zinc-200 rounded-xl font-bold text-sm hover:bg-zinc-50 transition-all shadow-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-4 bg-zinc-900 text-white rounded-xl font-bold text-base hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-200 disabled:opacity-50"
             >
               {downloading ? (
-                <Loader2 className="animate-spin" size={16} />
+                <Loader2 className="animate-spin" size={20} />
               ) : (
-                <Download size={16} />
+                <Download size={20} />
               )}
-              <span>{downloading ? "Generating..." : "Download PDF"}</span>
+              <span>{downloading ? "Generating Report..." : "Download Full Strategy PDF"}</span>
             </button>
           </div>
 
